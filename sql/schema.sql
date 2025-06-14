@@ -11,9 +11,10 @@ CREATE TABLE users (
 -- contacts table
 CREATE TABLE contacts (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100),
-  phone VARCHAR(20),
-  email VARCHAR(100),
+  name VARCHAR(255) NOT NULL,
+  phone VARCHAR(50) NOT NULL,
+  email VARCHAR(255),
+  location VARCHAR(255),
   created_by INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -31,6 +32,8 @@ CREATE TABLE messages (
   created_by INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE contacts ADD COLUMN location VARCHAR(255) AFTER email;
 
 -- To add a default admin user manually:
 -- INSERT INTO users (name, email, password, role) VALUES ('Admin', 'admin@example.com', '<hashed_password>', 'admin');
