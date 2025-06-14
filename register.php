@@ -22,7 +22,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: dashboard.php');
             exit;
         } else {
-            $error = "Error: " . $conn->error;
+            //check if email already exists
+            $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                $error = "User with this email already exists.";
+            } else {
+                $error = "Error: " . $conn->error;
+            }
         }
         $stmt->close();
     } else {
