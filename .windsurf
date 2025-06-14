@@ -1,0 +1,166 @@
+Customer Support Messaging App Documentation (Flat Structure)
+🧩 Overview
+
+A simple PHP-based customer support app to:
+
+    Import contacts from Google Sheets (via CSV)
+
+    Send WhatsApp messages using WhatsApp Web
+
+    Send SMS via device's messaging app
+
+    Send Emails via default email client (or Gmail SMTP)
+
+    Schedule message reminders
+
+    Manage users with Admin and Moderator roles
+
+🛠️ Technologies Used
+
+    Backend: PHP
+
+    Frontend: HTML, Bootstrap, JavaScript
+
+    Database: MySQL
+
+    Messaging: Free via:
+
+        https://wa.me/
+
+        sms: links
+
+        mailto: links
+
+📂 File Structure (All Flat)
+
+index.php
+login.php
+logout.php
+register.php
+dashboard.php
+contacts.php
+send.php
+schedule.php
+import.php
+users.php
+cron.php (for scheduler)
+
+config.php
+db.php
+auth.php
+functions.php
+
+assets/
+  css/
+  js/
+
+uploads/
+  contacts.csv
+
+sql/
+  schema.sql
+
+🗄️ Database Schema Summary
+users
+
+id INT PRIMARY KEY AUTO_INCREMENT
+name VARCHAR(100)
+email VARCHAR(100) UNIQUE
+password VARCHAR(255) -- hashed
+role ENUM('admin', 'moderator')
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+contacts
+
+id INT PRIMARY KEY AUTO_INCREMENT
+name VARCHAR(100)
+phone VARCHAR(20)
+email VARCHAR(100)
+created_by INT
+created_at TIMESTAMP
+
+messages
+
+id INT PRIMARY KEY AUTO_INCREMENT
+contact_id INT
+type ENUM('sms', 'whatsapp', 'email')
+subject VARCHAR(255)
+content TEXT
+status ENUM('pending', 'sent', 'failed')
+scheduled_at DATETIME
+sent_at DATETIME
+created_by INT
+created_at TIMESTAMP
+
+🛠️ Key Pages
+Page	Description
+login.php	User login form
+logout.php	Ends session
+register.php	(Optional) Create users manually
+dashboard.php	Stats and navigation
+contacts.php	List, import, and manage contacts
+send.php	Compose and send messages
+schedule.php	Schedule messages for future send
+users.php	Admin-only: manage users
+cron.php	Run every minute via cron to send due messages
+📤 Free Messaging
+✅ WhatsApp via Web
+
+echo "<a href='https://wa.me/{$phone}?text={$message}' target='_blank'>Send WhatsApp</a>";
+
+✅ SMS via Device
+
+<a href="sms:0712345678?body=Your message here">Send SMS</a>
+
+✅ Email via Mailto
+
+<a href="mailto:test@example.com?subject=Support&body=Hello">Send Email</a>
+
+🧩 Importing Contacts from Google Sheets
+
+    Export your sheet as .csv
+
+    Upload to uploads/contacts.csv
+
+    Run import.php to parse and save to database
+
+🛡️ Authentication Flow
+
+    Sessions stored via $_SESSION['user_id'], $_SESSION['role']
+
+    Check session + role at top of each page:
+
+session_start();
+if (!isset($_SESSION['user_id'])) {
+  header("Location: login.php");
+  exit;
+}
+
+⏰ Message Scheduling
+
+    Save future messages with status = 'pending'
+
+    cron.php runs every minute to:
+
+        Check for due messages
+
+        Prompt user (or open link) for WhatsApp/SMS
+
+        Auto-send emails if using SMTP
+
+🧪 First-Time Setup
+
+    Create MySQL database
+
+    Import sql/schema.sql
+
+    Set DB credentials in config.php
+
+    Create admin user in users table manually (or build register.php)
+
+    Start with login.php
+
+🛠️ Cron Job (Every Minute)
+
+* * * * * /usr/bin/php /path-to-project/cron.php
+
