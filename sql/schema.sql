@@ -4,7 +4,7 @@ CREATE TABLE users (
   name VARCHAR(100),
   email VARCHAR(100) UNIQUE,
   password VARCHAR(255),
-  role ENUM('admin', 'moderator') DEFAULT 'moderator',
+  role ENUM('admin', 'moderator', 'user') DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
