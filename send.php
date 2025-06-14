@@ -1,0 +1,2 @@
+<?php
+// Send message placeholder

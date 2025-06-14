@@ -1,0 +1,2 @@
+<?php
+// Import contacts placeholder

@@ -1,0 +1,2 @@
+<?php
+// Contacts management placeholder

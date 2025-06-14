@@ -163,4 +163,176 @@ if (!isset($_SESSION['user_id'])) {
 🛠️ Cron Job (Every Minute)
 
 * * * * * /usr/bin/php /path-to-project/cron.php
+Step-by-Step Implementation Plan
+⚙️ 1. Project Setup
+🔧 Backend & DB
 
+Install PHP & MySQL (XAMPP/WAMP/LAMP or server)
+
+Create a MySQL database (e.g. support_app)
+
+    Create a file: config.php with DB credentials
+
+// config.php
+$conn = new mysqli("localhost", "root", "", "support_app");
+if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
+
+📁 Project Folder Structure
+
+project/
+├── index.php (redirects to login/dashboard)
+├── login.php
+├── logout.php
+├── dashboard.php
+├── contacts.php
+├── import.php
+├── send.php
+├── schedule.php
+├── users.php
+├── cron.php
+├── config.php
+├── db.php
+├── auth.php
+├── functions.php
+├── uploads/
+├── assets/
+└── sql/schema.sql
+
+🧱 2. Create Database Tables
+Create schema (save as sql/schema.sql)
+
+-- users table
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  email VARCHAR(100) UNIQUE,
+  password VARCHAR(255),
+  role ENUM('admin', 'moderator') DEFAULT 'moderator',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- contacts table
+CREATE TABLE contacts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  phone VARCHAR(20),
+  email VARCHAR(100),
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- messages table
+CREATE TABLE messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  contact_id INT,
+  type ENUM('sms', 'whatsapp', 'email'),
+  subject VARCHAR(255),
+  content TEXT,
+  status ENUM('pending', 'sent', 'failed') DEFAULT 'pending',
+  scheduled_at DATETIME,
+  sent_at DATETIME NULL,
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+👤 3. User Authentication System
+Files to Create:
+
+    login.php: login form & logic (email + password)
+
+    logout.php: destroys session
+
+    auth.php: utility to protect routes
+
+// auth.php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+  header("Location: login.php");
+  exit;
+}
+
+    Passwords: use password_hash() and password_verify()
+
+    Add a default admin manually or via register.php
+
+📇 4. Contact Management
+contacts.php
+
+    Display all contacts
+
+    Allow search/filter
+
+    Option to add, edit, delete
+
+import.php
+
+    Upload .csv file exported from Google Sheets
+
+    Parse and insert into contacts table
+
+✉️ 5. Message Sending Pages
+send.php
+
+    Select contacts
+
+    Choose type: WhatsApp, SMS, or Email
+
+    Enter message content
+
+Generate message links:
+
+// WhatsApp
+echo "<a href='https://wa.me/{$phone}?text={$msg}' target='_blank'>Send</a>";
+
+// SMS
+echo "<a href='sms:{$phone}?body={$msg}'>Send SMS</a>";
+
+// Email
+echo "<a href='mailto:{$email}?subject={$subject}&body={$msg}'>Send Email</a>";
+
+📆 6. Scheduling Messages
+schedule.php
+
+    Select contacts + time to send
+
+    Store in messages table with scheduled_at and status = 'pending'
+
+⏱️ 7. Scheduler Script (cron)
+cron.php
+
+    Check messages table for pending messages due now
+
+    For:
+
+        WhatsApp/SMS: generate/send links via frontend or notification
+
+        Email: optionally send via PHPMailer or Gmail SMTP
+
+👥 8. User Management (Admin Only)
+users.php
+
+    Add/edit/delete users
+
+    Set user roles (admin, moderator)
+
+    List all registered users
+
+🧪 9. Final Testing & UX Improvements
+
+Ensure only logged-in users access pages
+
+Add Bootstrap styling for forms/tables
+
+Add JS confirmation popups for delete/send actions
+
+Add search/filter for contacts/messages
+
+    Test on mobile (for SMS links)
+
+📝 10. Optional Enhancements
+Feature	How to implement
+Message templates	Create and store reusable message formats
+Email via SMTP	Use PHPMailer + Gmail/Outlook SMTP
+WhatsApp automation	Use Node.js + Puppeteer to auto-send via WhatsApp Web
+Analytics	Track message success/failure
+Export contacts/messages	Export to CSV
